@@ -1,17 +1,17 @@
-public class CommandExecutor {
-    char[][] fieldmap;
-    char[][] tracker;
-    int commandCount=0;
-    int fuelcost=0;
-    int paintPenalty=0;
-    int protectedTreePenalty=0;
-    int row=-1;
-    int column=-1;
-    int dir =1;
-    int maxRow = 0;
-    int maxColumn=0;
-    int protectedTreeCount=0;
-    StringBuffer commands=new StringBuffer();
+ class CommandExecutor {
+    private char[][] fieldmap;      //input site map
+    private char[][] tracker;       //to track cleared squares
+    private int commandCount=0;     //number of commands
+    private int fuelcost=0;         //cost for fuel
+    private int paintPenalty=0;     //penalty for paint damage when crossing 't'
+    private int protectedTreePenalty=0;  // penalty for crossing protected tree
+    private int row=-1;             //current row position
+    private int column=-1;          //current column position
+    private int dir =1;             //current facing direction
+    private int maxRow = 0;         //maximum row length
+    private int maxColumn=0;        //maximum column length
+    private int protectedTreeCount=0; // number of protected tree
+    private StringBuffer commands=new StringBuffer();  // concatenated input command string
     /* dir :
      *   0 = north facing
      *   1 = east facing
@@ -28,16 +28,18 @@ public class CommandExecutor {
     }
 
     private void countProtectedTree() {
-        for (int i=0;i<fieldmap.length;i++)
-        {
-            for(int j=0;j<fieldmap[0].length;j++)
-            {
-                if(fieldmap[i][j]=='T')
-                {protectedTreeCount++;}
+        for (char[] chars : fieldmap) {
+            for (int j = 0; j < fieldmap[0].length; j++) {
+                if (chars[j] == 'T') {
+                    protectedTreeCount++;
+                }
             }
         }
     }
 
+     /**
+      * @param input String input from the command line provided by user at runtime
+      */
     public void executeCommand(String input)
     {
         if(input.equals("l"))
@@ -85,7 +87,7 @@ public class CommandExecutor {
         {   commandCount++;
             try {
                 int steps = Integer.parseInt(input.substring(input.indexOf(" ") + 1));
-                commands.append("advance " + steps + ", ");
+                commands.append("advance ").append(steps).append(", ");
                 navigate(steps);
             }
             catch (NumberFormatException exception)
@@ -108,12 +110,10 @@ public class CommandExecutor {
     }
     private int countRemainingBlocks(){
         int result=0;
-        for (int i=0;i<tracker.length;i++)
-        {
-            for(int j=0;j<tracker[0].length;j++)
-            {
-                if(tracker[i][j]==1)
-                {result++;
+        for (char[] chars : tracker) {
+            for (int j = 0; j < tracker[0].length; j++) {
+                if (chars[j] == 1) {
+                    result++;
                 }
             }
         }
@@ -121,9 +121,7 @@ public class CommandExecutor {
     }
 
     /**
-     * Description  :
-     * Pasrams :
-     * Return :
+     * Description  : Calculates and prints the output for simulator when quit command is executed.
      */
     private void calculateTotal() {
         System.out.println("The simulation has ended at your request. These are the commands you issued:");
@@ -140,9 +138,11 @@ public class CommandExecutor {
         System.out.println("---------------------------------------------------------------------------");
         System.out.println("Total                                                   "+(commandCount+fuelcost+(protectedTreePenalty*10)+(paintPenalty*2)+(remainingBlockCount*3)));
         System.out.println("Thank you for using the Aconex site clearing simulator.");
-        System.exit(0);
     }
 
+     /**
+      * @param steps Moves the bulldozer by given steps in current direction
+      */
     private void navigate(int steps) {
         switch(dir) {
             case 0: // moving in north
@@ -152,34 +152,17 @@ public class CommandExecutor {
                 if (row-steps>=0) {
                     while (steps > 0) {
                         row--;
-                        if (row >= 0) {
-                            if (fieldmap[row][column] == 'o')
-                                fuelcost = fuelcost + 1;
-                            else if (fieldmap[row][column] == 'r') {
-                                fuelcost = fuelcost + 2;
-                                fieldmap[row][column] = 'o';
-                            } else if (fieldmap[row][column] == 't') {
-                                fuelcost = fuelcost + 2;
-                                fieldmap[row][column] = 'o';
-                                if (steps != 1)
-                                    paintPenalty++;
-                            } else if (fieldmap[row][column] == 'T') {
-                                protectedTreePenalty++;
-                                executeCommand("q");
-                                break;
-                            }
-
-                        } else {
-                            executeCommand("q");
-                            break;
-                        }
+                        costCalculator(steps);
+                        if(protectedTreePenalty>0)
+                        return;
                         tracker[row][column] = 1;
                         steps--;
                     }
                 }
                 else {
+                    System.out.println("Input command argument outside the site boundary. Quitting the simulator.");
                     executeCommand("q");
-                    break;
+                    return;
                 }
                 break;
             }
@@ -190,34 +173,17 @@ public class CommandExecutor {
                 if(column+steps<maxColumn) {
                     while (steps > 0) {
                         column++;
-                        if (column < maxColumn) {
-                            if (fieldmap[row][column] == 'o')
-                                fuelcost = fuelcost + 1;
-                            else if (fieldmap[row][column] == 'r') {
-                                fuelcost = fuelcost + 2;
-                                fieldmap[row][column] = 'o';
-                            } else if (fieldmap[row][column] == 't') {
-                                fuelcost = fuelcost + 2;
-                                fieldmap[row][column] = 'o';
-                                if (steps != 1)
-                                    paintPenalty++;
-                            } else if (fieldmap[row][column] == 'T') {
-                                protectedTreePenalty++;
-                                executeCommand("q");
-                                break;
-                            }
-
-                        } else {
-                            executeCommand("q");
-                            break;
-                        }
+                       costCalculator(steps);
+                        if(protectedTreePenalty>0)
+                       return;
                         tracker[row][column] = 1;
                         steps--;
                     }
                 }
                 else {
+                    System.out.println("Input command argument outside the site boundary. Quitting the simulator.");
                     executeCommand("q");
-                    break;
+                    return;
                 }
                 break;
             }
@@ -228,34 +194,17 @@ public class CommandExecutor {
                 if(column-steps>=0) {
                     while (steps > 0) {
                         column--;
-                        if (column >= 0) {
-                            if (fieldmap[row][column] == 'o')
-                                fuelcost = fuelcost + 1;
-                            else if (fieldmap[row][column] == 'r') {
-                                fuelcost = fuelcost + 2;
-                                fieldmap[row][column] = 'o';
-                            } else if (fieldmap[row][column] == 't') {
-                                fuelcost = fuelcost + 2;
-                                fieldmap[row][column] = 'o';
-                                if (steps != 1)
-                                    paintPenalty++;
-                            } else if (fieldmap[row][column] == 'T') {
-                                protectedTreePenalty++;
-                                executeCommand("q");
-                                break;
-                            }
-
-                        } else {
-                            executeCommand("q");
-                            break;
-                        }
+                        costCalculator(steps);
+                        if(protectedTreePenalty>0)
+                        return;
                         tracker[row][column] = 1;
                         steps--;
                     }
                 }
                 else {
+                    System.out.println("Input command argument outside the site boundary. Quitting the simulator.");
                     executeCommand("q");
-                    break;
+                    return;
                 }
                 break;
             }
@@ -266,41 +215,47 @@ public class CommandExecutor {
                 if(row+steps<maxRow) {
                     while (steps > 0) {
                         row++;
-                        if (row < maxRow) {
-                            if (fieldmap[row][column] == 'o')
-                                fuelcost = fuelcost + 1;
-                            else if (fieldmap[row][column] == 'r') {
-                                fuelcost = fuelcost + 2;
-                                fieldmap[row][column] = 'o';
-                            } else if (fieldmap[row][column] == 't') {
-                                fuelcost = fuelcost + 2;
-                                fieldmap[row][column] = 'o';
-                                if (steps != 1) {
-                                    paintPenalty++;
-                                }
-                            } else if (fieldmap[row][column] == 'T') {
-                                protectedTreePenalty++;
-                                executeCommand("q");
-                                break;
-                            }
-
-                        } else {
-                            executeCommand("q");
-                            break;
-                        }
+                        costCalculator(steps);
+                        if(protectedTreePenalty>0)
+                            return;
                         tracker[row][column] = 1;
                         steps--;
                     }
                 }
                 else
                     {
+                        System.out.println("Input command argument outside the site boundary. Quitting the simulator.");
                         executeCommand("q");
-                        break;
+                        return;
                     }
 
                 break;
             }
         }
         ConstructionSiteSimulator.startStimulator();
+    }
+
+
+     /**
+      * Calculates cost for each block based on current row and column position
+      */
+    private void costCalculator(int steps){
+        if (fieldmap[row][column] == 'o')
+            fuelcost = fuelcost + 1;
+        else if (fieldmap[row][column] == 'r') {
+            fuelcost = fuelcost + 2;
+            fieldmap[row][column] = 'o';
+        } else if (fieldmap[row][column] == 't') {
+            fuelcost = fuelcost + 2;
+            fieldmap[row][column] = 'o';
+            if (steps != 1) {
+                paintPenalty++;
+            }
+        } else if (fieldmap[row][column] == 'T') {
+            protectedTreePenalty++;
+            System.out.println("Protected tree damaged. Quitting the simulator.");
+            executeCommand("q");
+            return;
+        }
     }
 }

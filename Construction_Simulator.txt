@@ -1,0 +1,20 @@
+The project Construction Site Simulator has three classes as described below:
+
+1. ConstructionSiteSimulator: This is the main class that accepts the input file path as command line argument. This class also reads the command lines input provided by the user at run time and passes it to CommandExecutor class.
+2. FileUtils: This file accepts the input string for file path from ConstructionSiteSimulator and reads the input file. It creates a 2d char array that represents the input Site map.
+3. CommandExecutor: This is core class that executes the input command and calculates the cost for all the different perspectives like fuel, paint damage, commands etc.
+
+Other files:
+Test.txt- Input file that contains the Site map as per the Problem statement.
+Sample Commands- This file contains sample commands for different test cases as per test.txt input.
+
+The project can be executed by importing the three java files into any IDE and using JDK 1.5 or higher.
+The program expects a file path to be passed as program argument.
+Once the program is run, the input file path is passed from main method to readFile method in FileUtils.java. If the path is valid, a 2d char array is created and passed as output.
+If the path is invalid or input file is empty, exception is thrown and the program exits execution.
+Once the fieldmap is available in main method, it is passed to CommandExecutor constructor to create an object.
+The CommandExecutor constructor sets up initial parameters.
+The startSimulator method starts reading input commands one by one and passes them to executeCommand method. This method either changes the current direction based on input command or calls navigate method to move bulldozer on the fieldmap or quits the simulator.
+There can be two possibilities for current direction based on left or right command. Since there are four directions and 2 possibilities for each direction, that results in four switch cases for each left and right each.
+The navigate method moves the bulldozer in current direction after checking the boundary condition. In case the boundary of the site is crossed, the simulator quits automatically.
+The calculateTotal calculates the final cost and prints the output as per the problem statement.

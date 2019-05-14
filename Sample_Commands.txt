@@ -28,3 +28,14 @@ r
 r
 a 3
 q
+
+
+Set 6: (Case for incorrect command format)
+a3
+
+Set 7: (Case for invalid command)
+b
+
+Case for providing invalid file path for input
+
+Case for providing empty file.
