@@ -5,8 +5,8 @@ The project Construction Site Simulator has three classes as described below:
 3. CommandExecutor: This is core class that executes the input command and calculates the cost for all the different perspectives like fuel, paint damage, commands etc.
 
 Other files:
-Test.txt- Input file that contains the Site map as per the Problem statement.
-Sample Commands- This file contains sample commands for different test cases as per test.txt input.
+Test.txt: Input file that contains the Site map as per the Problem statement.
+Sample_Commands.txt: This file contains sample commands for different test cases as per test.txt input.
 
 The project can be executed by importing the three java files into any IDE and using JDK 1.5 or higher.
 The program expects a file path to be passed as program argument.
